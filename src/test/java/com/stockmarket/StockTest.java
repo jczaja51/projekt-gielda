@@ -49,7 +49,7 @@
             Stock s2 = new Stock("META", "Meta Platforms, Inc.", 330.50);
             assertNotEquals(s1, s2);
         }
-    
+
         @Test
         void equalsShouldHandleNullAndSelf() {
             Stock stock = new Stock("AAPL", "Apple Inc.", 180.10);

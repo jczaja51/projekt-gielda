@@ -12,6 +12,13 @@ public class Portfolio {
         private int quantity;
 
         public StockHolding(Stock stock, int quantity) {
+            if (stock == null) {
+                throw new IllegalArgumentException("Stock nie może być null");
+            }
+            if (quantity <= 0) {
+                throw new IllegalArgumentException("Ilość musi być dodatnia");
+            }
+
             this.stock = stock;
             this.quantity = quantity;
         }
@@ -26,14 +33,14 @@ public class Portfolio {
         this.holdingsCount = 0;
     }
 
-    public void addStock(Stock stock, int quantity) {
+    public int addStock(Stock stock, int quantity) {
         if (stock == null) throw new IllegalArgumentException("Stock nie może być null");
         if (quantity <= 0) throw new IllegalArgumentException("Ilość musi być dodatnia");
 
         for (int i = 0; i < holdingsCount; i++) {
             if (holdings[i].stock.equals(stock)) {
                 holdings[i].quantity += quantity;
-                return;
+                return holdings[i].quantity;
             }
         }
 
@@ -42,6 +49,7 @@ public class Portfolio {
         }
 
         holdings[holdingsCount++] = new StockHolding(stock, quantity);
+        return quantity;
     }
 
     public double calculateStockValue() {
