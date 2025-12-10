@@ -1,3 +1,6 @@
-com/stockmarket/Stock.class
-com/stockmarket/Portfolio$StockHolding.class
-com/stockmarket/Portfolio.class
+com/stockmarket/logic/Portfolio.class
+com/stockmarket/domain/Commodity.class
+com/stockmarket/domain/Share.class
+com/stockmarket/domain/Asset.class
+com/stockmarket/logic/Portfolio$AssetHolding.class
+com/stockmarket/domain/Currency.class

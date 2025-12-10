@@ -1,2 +1,3 @@
-com/stockmarket/PortfolioTest.class
-com/stockmarket/StockTest.class
+com/stockmarket/BusinessLogicTest.class
+com/stockmarket/PortfolioIntegrationTest.class
+com/stockmarket/PolymorphismTest.class

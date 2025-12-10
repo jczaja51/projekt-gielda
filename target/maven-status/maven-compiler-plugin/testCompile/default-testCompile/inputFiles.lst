@@ -1,2 +1,3 @@
-/Users/jakub/Desktop/stock-market-sim/src/test/java/com/stockmarket/PortfolioTest.java
-/Users/jakub/Desktop/stock-market-sim/src/test/java/com/stockmarket/StockTest.java
+/Users/jakub/Desktop/stock-market-sim/src/test/java/com/stockmarket/BusinessLogicTest.java
+/Users/jakub/Desktop/stock-market-sim/src/test/java/com/stockmarket/PolymorphismTest.java
+/Users/jakub/Desktop/stock-market-sim/src/test/java/com/stockmarket/PortfolioIntegrationTest.java

@@ -1,4 +1,7 @@
 GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
-Stock Market Simulator,com.stockmarket,Stock,0,102,2,12,0,19,2,12,0,7
-Stock Market Simulator,com.stockmarket,Portfolio.StockHolding,10,13,2,2,2,6,2,1,0,1
-Stock Market Simulator,com.stockmarket,Portfolio,5,152,1,17,1,27,1,15,0,7
+Stock Market Simulator,com.stockmarket.logic,Portfolio.AssetHolding,10,13,2,2,2,6,2,1,0,1
+Stock Market Simulator,com.stockmarket.logic,Portfolio,93,126,7,13,19,27,7,10,1,6
+Stock Market Simulator,com.stockmarket.domain,Commodity,10,53,2,2,2,12,2,4,0,4
+Stock Market Simulator,com.stockmarket.domain,Currency,10,40,2,2,2,10,2,3,0,3
+Stock Market Simulator,com.stockmarket.domain,Share,0,34,0,0,0,8,0,3,0,3
+Stock Market Simulator,com.stockmarket.domain,Asset,26,35,6,6,6,11,8,3,2,3
