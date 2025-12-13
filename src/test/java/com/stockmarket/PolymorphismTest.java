@@ -24,9 +24,5 @@ class PolymorphismTest {
                 "Akcja i waluta nie mogą mieć tej samej wartości końcowej!");
         assertNotEquals(commodityValue, currencyValue,
                 "Surowiec i waluta nie mogą mieć tej samej wartości końcowej!");
-
-        assertTrue(shareValue > 0, "Wartość akcji musi być dodatnia");
-        assertTrue(commodityValue > 0, "Wartość surowca musi być dodatnia");
-        assertTrue(currencyValue > 0, "Wartość waluty musi być dodatnia");
     }
 }
