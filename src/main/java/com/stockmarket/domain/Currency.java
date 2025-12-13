@@ -27,7 +27,6 @@ public class Currency extends Asset {
     public double calculatePurchaseCost(int quantity) {
         validateQuantity(quantity);
 
-        // Zakup po cenie ASK (basePrice)
         return getBasePrice() * quantity;
     }
 }

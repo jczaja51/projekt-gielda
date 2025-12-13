@@ -15,7 +15,6 @@ public class Share extends Asset {
         double gross = getBasePrice() * quantity;
         double net = gross - MANIPULATION_FEE;
 
-        // Wartość rzeczywista nie może spaść poniżej zera
         return Math.max(0.0, net);
     }
 

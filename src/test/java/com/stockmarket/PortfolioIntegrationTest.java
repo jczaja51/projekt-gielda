@@ -12,7 +12,7 @@ public class PortfolioIntegrationTest {
     void totalValueIsCashPlusRealAssetValues() {
         Portfolio p = new Portfolio(5000.0);
 
-        Share share = new Share("AAA", "Firma AAA", 50.0);
+        Share share = new Share("MFG", "Firma MFG", 50.0);
         Commodity commodity = new Commodity("OIL", "Ropa", 80.0, 2.0);
         Currency currency = new Currency("EUR", "Euro", 4.50, 0.10);
 
@@ -30,7 +30,7 @@ public class PortfolioIntegrationTest {
     void increasesQuantityWhenBuyingSameAssetAgain() {
         Portfolio p = new Portfolio(10_000);
 
-        Share s = new Share("X", "XCorp", 20);
+        Share s = new Share("XYZ", "XCorp", 20);
 
         p.buyAsset(s, 5);
         p.buyAsset(s, 3);

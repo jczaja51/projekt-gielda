@@ -15,15 +15,14 @@ public class Share extends Asset {
 <span class="fc" id="L15">        double gross = getBasePrice() * quantity;</span>
 <span class="fc" id="L16">        double net = gross - MANIPULATION_FEE;</span>
 
-        // Wartość rzeczywista nie może spaść poniżej zera
-<span class="fc" id="L19">        return Math.max(0.0, net);</span>
+<span class="fc" id="L18">        return Math.max(0.0, net);</span>
     }
 
     @Override
     public double calculatePurchaseCost(int quantity) {
-<span class="fc" id="L24">        validateQuantity(quantity);</span>
+<span class="fc" id="L23">        validateQuantity(quantity);</span>
 
-<span class="fc" id="L26">        return getBasePrice() * quantity + MANIPULATION_FEE;</span>
+<span class="fc" id="L25">        return getBasePrice() * quantity + MANIPULATION_FEE;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>
