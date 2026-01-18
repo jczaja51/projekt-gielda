@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pl"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Order.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Stock Market Simulator</a> &gt; <a href="index.source.html" class="el_package">com.stockmarket.logic</a> &gt; <span class="el_source">Order.java</span></div><h1>Order.java</h1><pre class="source lang-java linenums">package com.stockmarket.logic;
+
+import java.time.LocalDateTime;
+
+public class Order {
+
+    private final String symbol;
+    private final OrderType type;
+    private final int quantity;
+    private final double limitPrice;
+    private final LocalDateTime createdAt;
+
+<span class="fc" id="L13">    public Order(String symbol, OrderType type, int quantity, double limitPrice) {</span>
+<span class="pc bpc" id="L14" title="2 of 4 branches missed.">        if (symbol == null || symbol.isBlank()) {</span>
+<span class="nc" id="L15">            throw new IllegalArgumentException(&quot;Symbol nie może być pusty.&quot;);</span>
+        }
+<span class="pc bpc" id="L17" title="1 of 2 branches missed.">        if (type == null) {</span>
+<span class="nc" id="L18">            throw new IllegalArgumentException(&quot;Typ zlecenia nie może być null.&quot;);</span>
+        }
+<span class="pc bpc" id="L20" title="1 of 2 branches missed.">        if (quantity &lt;= 0) {</span>
+<span class="nc" id="L21">            throw new IllegalArgumentException(&quot;Ilość musi być dodatnia.&quot;);</span>
+        }
+<span class="pc bpc" id="L23" title="1 of 2 branches missed.">        if (limitPrice &lt;= 0) {</span>
+<span class="nc" id="L24">            throw new IllegalArgumentException(&quot;Limit price musi być dodatni.&quot;);</span>
+        }
+
+<span class="fc" id="L27">        this.symbol = symbol.trim().toUpperCase();</span>
+<span class="fc" id="L28">        this.type = type;</span>
+<span class="fc" id="L29">        this.quantity = quantity;</span>
+<span class="fc" id="L30">        this.limitPrice = limitPrice;</span>
+<span class="fc" id="L31">        this.createdAt = LocalDateTime.now();</span>
+<span class="fc" id="L32">    }</span>
+
+    public String getSymbol() {
+<span class="fc" id="L35">        return symbol;</span>
+    }
+
+    public OrderType getType() {
+<span class="fc" id="L39">        return type;</span>
+    }
+
+    public int getQuantity() {
+<span class="nc" id="L43">        return quantity;</span>
+    }
+
+    public double getLimitPrice() {
+<span class="fc" id="L47">        return limitPrice;</span>
+    }
+
+    public LocalDateTime getCreatedAt() {
+<span class="fc" id="L51">        return createdAt;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pl"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MarketData.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Stock Market Simulator</a> &gt; <a href="index.source.html" class="el_package">com.stockmarket.logic</a> &gt; <span class="el_source">MarketData.java</span></div><h1>MarketData.java</h1><pre class="source lang-java linenums">package com.stockmarket.logic;
+
+import java.util.HashMap;
+import java.util.Map;
+
+<span class="fc" id="L6">public class MarketData {</span>
+
+<span class="fc" id="L8">    private final Map&lt;String, Double&gt; prices = new HashMap&lt;&gt;();</span>
+
+    public void setPrice(String symbol, double price) {
+<span class="fc bfc" id="L11" title="All 4 branches covered.">        if (symbol == null || symbol.isBlank()) {</span>
+<span class="fc" id="L12">            throw new IllegalArgumentException(&quot;Symbol nie może być pusty.&quot;);</span>
+        }
+<span class="fc bfc" id="L14" title="All 2 branches covered.">        if (price &lt;= 0) {</span>
+<span class="fc" id="L15">            throw new IllegalArgumentException(&quot;Cena musi być dodatnia.&quot;);</span>
+        }
+<span class="fc" id="L17">        prices.put(symbol.trim().toUpperCase(), price);</span>
+<span class="fc" id="L18">    }</span>
+
+    public double getPrice(String symbol) {
+<span class="pc bpc" id="L21" title="1 of 4 branches missed.">        if (symbol == null || symbol.isBlank()) {</span>
+<span class="fc" id="L22">            throw new IllegalArgumentException(&quot;Symbol nie może być pusty.&quot;);</span>
+        }
+
+<span class="fc" id="L25">        Double price = prices.get(symbol.trim().toUpperCase());</span>
+<span class="fc bfc" id="L26" title="All 2 branches covered.">        if (price == null) {</span>
+<span class="fc" id="L27">            throw new IllegalStateException(&quot;Brak ceny rynkowej dla: &quot; + symbol);</span>
+        }
+<span class="fc" id="L29">        return price;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

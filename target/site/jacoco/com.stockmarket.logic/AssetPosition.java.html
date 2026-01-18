@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pl"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AssetPosition.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Stock Market Simulator</a> &gt; <a href="index.source.html" class="el_package">com.stockmarket.logic</a> &gt; <span class="el_source">AssetPosition.java</span></div><h1>AssetPosition.java</h1><pre class="source lang-java linenums">package com.stockmarket.logic;
+
+import com.stockmarket.domain.Asset;
+
+import java.util.Comparator;
+import java.util.PriorityQueue;
+
+public class AssetPosition {
+
+    private final Asset asset;
+
+<span class="fc" id="L12">    private final PriorityQueue&lt;PurchaseLot&gt; lots =</span>
+<span class="fc" id="L13">            new PriorityQueue&lt;&gt;(Comparator.comparing(PurchaseLot::getPurchaseDate));</span>
+
+<span class="fc" id="L15">    private int totalQuantity = 0;</span>
+
+<span class="fc" id="L17">    public AssetPosition(Asset asset) {</span>
+<span class="pc bpc" id="L18" title="1 of 2 branches missed.">        if (asset == null) {</span>
+<span class="nc" id="L19">            throw new IllegalArgumentException(&quot;Asset nie może być null.&quot;);</span>
+        }
+<span class="fc" id="L21">        this.asset = asset;</span>
+<span class="fc" id="L22">    }</span>
+
+    public Asset getAsset() {
+<span class="fc" id="L25">        return asset;</span>
+    }
+
+    public void addLot(PurchaseLot lot) {
+<span class="pc bpc" id="L29" title="1 of 2 branches missed.">        if (lot == null) {</span>
+<span class="nc" id="L30">            throw new IllegalArgumentException(&quot;PurchaseLot nie może być null.&quot;);</span>
+        }
+<span class="fc" id="L32">        lots.add(lot);</span>
+<span class="fc" id="L33">        totalQuantity += lot.getQuantity();</span>
+<span class="fc" id="L34">    }</span>
+
+    public int getTotalQuantity() {
+<span class="fc" id="L37">        return totalQuantity;</span>
+    }
+
+    public PurchaseLot peekOldestLot() {
+<span class="fc" id="L41">        return lots.peek();</span>
+    }
+
+    public PurchaseLot pollOldestLot() {
+<span class="fc" id="L45">        return lots.poll();</span>
+    }
+
+    public void decreaseTotalQuantity(int amount) {
+<span class="pc bpc" id="L49" title="1 of 2 branches missed.">        if (amount &lt;= 0) {</span>
+<span class="nc" id="L50">            throw new IllegalArgumentException(&quot;Zmniejszenie ilości musi być dodatnie.&quot;);</span>
+        }
+<span class="pc bpc" id="L52" title="1 of 2 branches missed.">        if (amount &gt; totalQuantity) {</span>
+<span class="nc" id="L53">            throw new IllegalArgumentException(&quot;Nie można zmniejszyć poniżej zera.&quot;);</span>
+        }
+<span class="fc" id="L55">        totalQuantity -= amount;</span>
+<span class="fc" id="L56">    }</span>
+
+    public PriorityQueue&lt;PurchaseLot&gt; getLots() {
+<span class="fc" id="L59">        return new PriorityQueue&lt;&gt;(lots);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

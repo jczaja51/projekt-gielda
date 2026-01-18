@@ -1,0 +1,12 @@
+/Users/jakub/Desktop/stock-market-sim/src/test/java/com/stockmarket/FifoSellEdgeCaseTest.java
+/Users/jakub/Desktop/stock-market-sim/src/test/java/com/stockmarket/FifoSellTest.java
+/Users/jakub/Desktop/stock-market-sim/src/test/java/com/stockmarket/MarketDataTest.java
+/Users/jakub/Desktop/stock-market-sim/src/test/java/com/stockmarket/OrderMatchingConsistencyTest.java
+/Users/jakub/Desktop/stock-market-sim/src/test/java/com/stockmarket/OrderPriorityEdgeCaseTest.java
+/Users/jakub/Desktop/stock-market-sim/src/test/java/com/stockmarket/OrderPriorityTest.java
+/Users/jakub/Desktop/stock-market-sim/src/test/java/com/stockmarket/PolymorphismTest.java
+/Users/jakub/Desktop/stock-market-sim/src/test/java/com/stockmarket/PortfolioExceptionTest.java
+/Users/jakub/Desktop/stock-market-sim/src/test/java/com/stockmarket/PortfolioFileReaderTest.java
+/Users/jakub/Desktop/stock-market-sim/src/test/java/com/stockmarket/PortfolioFileWriterTest.java
+/Users/jakub/Desktop/stock-market-sim/src/test/java/com/stockmarket/PortfolioPersistenceConsistencyTest.java
+/Users/jakub/Desktop/stock-market-sim/src/test/java/com/stockmarket/PortfolioReportGeneratorTest.java

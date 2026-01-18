@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pl"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Portfolio.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Stock Market Simulator</a> &gt; <a href="index.source.html" class="el_package">com.stockmarket.logic</a> &gt; <span class="el_source">Portfolio.java</span></div><h1>Portfolio.java</h1><pre class="source lang-java linenums">package com.stockmarket.logic;
+
+import com.stockmarket.domain.Asset;
+
+import java.time.LocalDate;
+import java.util.*;
+
+public class Portfolio {
+
+    private double cash;
+
+<span class="fc" id="L12">    private final Map&lt;String, AssetPosition&gt; positions = new HashMap&lt;&gt;();</span>
+
+<span class="fc" id="L14">    private final Set&lt;String&gt; watchlist = new HashSet&lt;&gt;();</span>
+
+    private final MarketData marketData;
+
+    private final PriorityQueue&lt;Order&gt; orders;
+
+<span class="fc" id="L20">    public Portfolio(double initialCash, MarketData marketData) {</span>
+<span class="pc bpc" id="L21" title="1 of 2 branches missed.">        if (initialCash &lt; 0) {</span>
+<span class="nc" id="L22">            throw new IllegalArgumentException(&quot;Początkowa gotówka nie może być ujemna.&quot;);</span>
+        }
+<span class="pc bpc" id="L24" title="1 of 2 branches missed.">        if (marketData == null) {</span>
+<span class="nc" id="L25">            throw new IllegalArgumentException(&quot;MarketData nie może być null.&quot;);</span>
+        }
+
+<span class="fc" id="L28">        this.cash = initialCash;</span>
+<span class="fc" id="L29">        this.marketData = marketData;</span>
+<span class="fc" id="L30">        this.orders = new PriorityQueue&lt;&gt;(new OrderComparator(marketData));</span>
+<span class="fc" id="L31">    }</span>
+
+    public Portfolio(double initialCash) {
+<span class="fc" id="L34">        this(initialCash, new MarketData());</span>
+<span class="fc" id="L35">    }</span>
+
+    public double getCash() {
+<span class="fc" id="L38">        return cash;</span>
+    }
+
+    public void buyAsset(Asset asset, int quantity) {
+<span class="fc bfc" id="L42" title="All 2 branches covered.">        if (asset == null) {</span>
+<span class="fc" id="L43">            throw new IllegalArgumentException(&quot;Aktywo nie może być null.&quot;);</span>
+        }
+<span class="fc bfc" id="L45" title="All 2 branches covered.">        if (quantity &lt;= 0) {</span>
+<span class="fc" id="L46">            throw new IllegalArgumentException(&quot;Ilość musi być dodatnia.&quot;);</span>
+        }
+
+<span class="fc" id="L49">        double cost = asset.calculatePurchaseCost(quantity);</span>
+<span class="fc bfc" id="L50" title="All 2 branches covered.">        if (cost &gt; cash) {</span>
+<span class="fc" id="L51">            throw new IllegalStateException(&quot;Brak środków na zakup: potrzebne &quot; + cost);</span>
+        }
+
+<span class="fc" id="L54">        cash -= cost;</span>
+
+<span class="fc" id="L56">        String key = normalizeSymbol(asset.getSymbol());</span>
+<span class="fc" id="L57">        AssetPosition pos = positions.get(key);</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">        if (pos == null) {</span>
+<span class="fc" id="L59">            pos = new AssetPosition(asset);</span>
+<span class="fc" id="L60">            positions.put(key, pos);</span>
+        }
+
+<span class="fc" id="L63">        pos.addLot(new PurchaseLot(LocalDate.now(), quantity, asset.getBasePrice()));</span>
+<span class="fc" id="L64">    }</span>
+
+    public SellResult sellAssetFIFO(String symbol, int quantity, double sellPrice) {
+<span class="fc" id="L67">        String key = normalizeSymbol(symbol);</span>
+
+<span class="fc bfc" id="L69" title="All 2 branches covered.">        if (quantity &lt;= 0) {</span>
+<span class="fc" id="L70">            throw new IllegalArgumentException(&quot;Ilość musi być dodatnia.&quot;);</span>
+        }
+<span class="fc bfc" id="L72" title="All 2 branches covered.">        if (sellPrice &lt;= 0) {</span>
+<span class="fc" id="L73">            throw new IllegalArgumentException(&quot;Cena sprzedaży musi być dodatnia.&quot;);</span>
+        }
+
+<span class="fc" id="L76">        AssetPosition position = positions.get(key);</span>
+<span class="fc bfc" id="L77" title="All 4 branches covered.">        if (position == null || position.getTotalQuantity() &lt; quantity) {</span>
+<span class="fc" id="L78">            throw new InsufficientHoldingsException(&quot;Brak wystarczającej ilości aktywa: &quot; + key);</span>
+        }
+
+<span class="fc" id="L81">        int remaining = quantity;</span>
+<span class="fc" id="L82">        SellResult result = new SellResult();</span>
+
+<span class="fc bfc" id="L84" title="All 2 branches covered.">        while (remaining &gt; 0) {</span>
+<span class="fc" id="L85">            PurchaseLot lot = position.peekOldestLot();</span>
+
+<span class="pc bpc" id="L87" title="1 of 2 branches missed.">            if (lot == null) {</span>
+<span class="nc" id="L88">                throw new DataIntegrityException(</span>
+<span class="nc" id="L89">                        &quot;Niespójność FIFO dla &quot; + key + &quot;: brak lotów mimo totalQuantity=&quot; + position.getTotalQuantity()</span>
+                );
+            }
+
+<span class="fc" id="L93">            int available = lot.getQuantity();</span>
+<span class="pc bpc" id="L94" title="1 of 2 branches missed.">            if (available &lt;= 0) {</span>
+<span class="nc" id="L95">                position.pollOldestLot();</span>
+<span class="nc" id="L96">                continue;</span>
+            }
+
+<span class="fc" id="L99">            int used = Math.min(available, remaining);</span>
+
+<span class="fc" id="L101">            double profit = used * (sellPrice - lot.getUnitPrice());</span>
+<span class="fc" id="L102">            result.addClosure(new LotClosure(lot.getPurchaseDate(), used, profit));</span>
+
+<span class="fc" id="L104">            lot.decreaseQuantity(used);</span>
+<span class="fc" id="L105">            position.decreaseTotalQuantity(used);</span>
+
+<span class="fc" id="L107">            remaining -= used;</span>
+
+<span class="fc bfc" id="L109" title="All 2 branches covered.">            if (lot.getQuantity() == 0) {</span>
+<span class="fc" id="L110">                position.pollOldestLot();</span>
+            }
+<span class="fc" id="L112">        }</span>
+
+<span class="fc" id="L114">        int sold = quantity - remaining;</span>
+<span class="fc" id="L115">        cash += sold * sellPrice;</span>
+
+<span class="fc" id="L117">        return result;</span>
+    }
+
+    public boolean addToWatchlist(String symbol) {
+<span class="nc" id="L121">        String key = normalizeSymbol(symbol);</span>
+<span class="nc" id="L122">        return watchlist.add(key);</span>
+    }
+
+    public void placeOrder(Order order) {
+<span class="nc bnc" id="L126" title="All 2 branches missed.">        if (order == null) {</span>
+<span class="nc" id="L127">            throw new IllegalArgumentException(&quot;Order nie może być null.&quot;);</span>
+        }
+<span class="nc" id="L129">        orders.add(order);</span>
+<span class="nc" id="L130">    }</span>
+
+    public Order peekNextOrder() {
+<span class="nc" id="L133">        return orders.peek();</span>
+    }
+
+    public int getPendingOrdersCount() {
+<span class="nc" id="L137">        return orders.size();</span>
+    }
+
+    public double calculateTotalAssetsRealValue() {
+<span class="fc" id="L141">        double total = 0.0;</span>
+<span class="fc bfc" id="L142" title="All 2 branches covered.">        for (AssetPosition pos : positions.values()) {</span>
+<span class="fc" id="L143">            int qty = pos.getTotalQuantity();</span>
+<span class="pc bpc" id="L144" title="1 of 2 branches missed.">            if (qty &gt; 0) {</span>
+<span class="fc" id="L145">                total += pos.getAsset().calculateRealValue(qty);</span>
+            }
+<span class="fc" id="L147">        }</span>
+<span class="fc" id="L148">        return total;</span>
+    }
+
+    public double calculateTotalValue() {
+<span class="fc" id="L152">        return cash + calculateTotalAssetsRealValue();</span>
+    }
+
+    public void putPositionForLoad(Asset asset) {
+<span class="pc bpc" id="L156" title="1 of 2 branches missed.">        if (asset == null) {</span>
+<span class="nc" id="L157">            throw new IllegalArgumentException(&quot;Aktywo nie może być null.&quot;);</span>
+        }
+<span class="fc" id="L159">        String key = normalizeSymbol(asset.getSymbol());</span>
+<span class="pc bpc" id="L160" title="1 of 2 branches missed.">        if (!positions.containsKey(key)) {</span>
+<span class="fc" id="L161">            positions.put(key, new AssetPosition(asset));</span>
+        }
+<span class="fc" id="L163">    }</span>
+
+    public AssetPosition getPositionBySymbol(String symbol) {
+<span class="fc" id="L166">        String key = normalizeSymbol(symbol);</span>
+<span class="fc" id="L167">        return positions.get(key);</span>
+    }
+
+    public Iterable&lt;AssetPosition&gt; getPositions() {
+<span class="fc" id="L171">        return new ArrayList&lt;&gt;(positions.values());</span>
+    }
+
+    private String normalizeSymbol(String symbol) {
+<span class="pc bpc" id="L175" title="1 of 4 branches missed.">        if (symbol == null || symbol.isBlank()) {</span>
+<span class="fc" id="L176">            throw new IllegalArgumentException(&quot;Symbol nie może być pusty.&quot;);</span>
+        }
+<span class="fc" id="L178">        return symbol.trim().toUpperCase();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

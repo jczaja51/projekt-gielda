@@ -1,4 +1,6 @@
 package com.stockmarket.logic;
 
-public class OrderType {
+public enum OrderType {
+    BUY,
+    SELL
 }

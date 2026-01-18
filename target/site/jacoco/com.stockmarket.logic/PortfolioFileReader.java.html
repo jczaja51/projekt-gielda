@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pl"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PortfolioFileReader.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Stock Market Simulator</a> &gt; <a href="index.source.html" class="el_package">com.stockmarket.logic</a> &gt; <span class="el_source">PortfolioFileReader.java</span></div><h1>PortfolioFileReader.java</h1><pre class="source lang-java linenums">package com.stockmarket.logic;
+
+import com.stockmarket.domain.*;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.LocalDate;
+
+<span class="fc" id="L11">public class PortfolioFileReader {</span>
+
+    public Portfolio load(Path path) throws IOException {
+<span class="pc bpc" id="L14" title="1 of 2 branches missed.">        if (path == null) {</span>
+<span class="nc" id="L15">            throw new IllegalArgumentException(&quot;Ścieżka nie może być null.&quot;);</span>
+        }
+
+<span class="fc" id="L18">        Portfolio portfolio = null;</span>
+<span class="fc" id="L19">        Asset currentAsset = null;</span>
+
+<span class="fc" id="L21">        Integer declaredQuantity = null;</span>
+<span class="fc" id="L22">        int lotsQuantitySum = 0;</span>
+
+<span class="fc" id="L24">        try (BufferedReader br = Files.newBufferedReader(path)) {</span>
+            String line;
+<span class="fc" id="L26">            int lineNo = 0;</span>
+
+<span class="fc bfc" id="L28" title="All 2 branches covered.">            while ((line = br.readLine()) != null) {</span>
+<span class="fc" id="L29">                lineNo++;</span>
+
+<span class="pc bpc" id="L31" title="1 of 2 branches missed.">                if (line.isBlank()) {</span>
+<span class="nc" id="L32">                    continue;</span>
+                }
+
+<span class="fc" id="L35">                String[] parts = line.split(&quot;\\|&quot;, -1);</span>
+<span class="pc bpc" id="L36" title="2 of 4 branches missed.">                if (parts.length == 0 || parts[0].isBlank()) {</span>
+<span class="nc" id="L37">                    throw new DataIntegrityException(&quot;Linia &quot; + lineNo + &quot;: brak typu rekordu.&quot;);</span>
+                }
+
+<span class="fc" id="L40">                RecordType recordType = parseRecordType(parts[0], lineNo);</span>
+
+<span class="pc bpc" id="L42" title="1 of 4 branches missed.">                switch (recordType) {</span>
+
+                    case HEADER -&gt; {
+<span class="pc bpc" id="L45" title="1 of 2 branches missed.">                        if (parts.length != 3) {</span>
+<span class="nc" id="L46">                            throw new DataIntegrityException(&quot;Linia &quot; + lineNo + &quot;: Niepoprawny HEADER (zła liczba pól).&quot;);</span>
+                        }
+<span class="pc bpc" id="L48" title="1 of 2 branches missed.">                        if (!&quot;CASH&quot;.equals(parts[1])) {</span>
+<span class="nc" id="L49">                            throw new DataIntegrityException(&quot;Linia &quot; + lineNo + &quot;: Niepoprawny HEADER (oczekiwano CASH).&quot;);</span>
+                        }
+
+<span class="fc" id="L52">                        double cash = parseDouble(parts[2], &quot;Linia &quot; + lineNo + &quot;: Niepoprawna wartość CASH.&quot;);</span>
+
+<span class="fc" id="L54">                        portfolio = new Portfolio(cash);</span>
+<span class="fc" id="L55">                        currentAsset = null;</span>
+<span class="fc" id="L56">                        declaredQuantity = null;</span>
+<span class="fc" id="L57">                        lotsQuantitySum = 0;</span>
+<span class="fc" id="L58">                    }</span>
+
+                    case ASSET -&gt; {
+<span class="fc bfc" id="L61" title="All 2 branches covered.">                        if (portfolio == null) {</span>
+<span class="fc" id="L62">                            throw new DataIntegrityException(&quot;Linia &quot; + lineNo + &quot;: ASSET przed HEADER.&quot;);</span>
+                        }
+
+<span class="fc" id="L65">                        validateLotsConsistency(declaredQuantity, lotsQuantitySum);</span>
+
+<span class="pc bpc" id="L67" title="1 of 2 branches missed.">                        if (parts.length &lt; 6) {</span>
+<span class="nc" id="L68">                            throw new DataIntegrityException(&quot;Linia &quot; + lineNo + &quot;: Niepoprawna linia ASSET (za mało pól).&quot;);</span>
+                        }
+
+<span class="fc" id="L71">                        AssetType type = parseAssetType(parts[1], lineNo);</span>
+<span class="fc" id="L72">                        String symbol = requireNonBlank(parts[2], &quot;Linia &quot; + lineNo + &quot;: Symbol ASSET nie może być pusty.&quot;);</span>
+<span class="fc" id="L73">                        String name = requireNonBlank(parts[3], &quot;Linia &quot; + lineNo + &quot;: Nazwa ASSET nie może być pusta.&quot;);</span>
+
+<span class="fc" id="L75">                        double basePrice = parseDouble(parts[4], &quot;Linia &quot; + lineNo + &quot;: Niepoprawna cena bazowa.&quot;);</span>
+<span class="fc" id="L76">                        declaredQuantity = parseInt(parts[5], &quot;Linia &quot; + lineNo + &quot;: Niepoprawna declaredQuantity.&quot;);</span>
+<span class="fc" id="L77">                        lotsQuantitySum = 0;</span>
+
+<span class="pc bpc" id="L79" title="1 of 4 branches missed.">                        currentAsset = switch (type) {</span>
+                            case SHARE -&gt; {
+<span class="pc bpc" id="L81" title="1 of 2 branches missed.">                                if (parts.length != 6) {</span>
+<span class="nc" id="L82">                                    throw new DataIntegrityException(&quot;Linia &quot; + lineNo + &quot;: Niepoprawna linia SHARE (oczekiwano 6 pól).&quot;);</span>
+                                }
+<span class="fc" id="L84">                                yield new Share(symbol, name, basePrice);</span>
+                            }
+                            case CURRENCY -&gt; {
+<span class="pc bpc" id="L87" title="1 of 2 branches missed.">                                if (parts.length != 7) {</span>
+<span class="nc" id="L88">                                    throw new DataIntegrityException(&quot;Linia &quot; + lineNo + &quot;: Niepoprawna linia CURRENCY (oczekiwano 7 pól).&quot;);</span>
+                                }
+<span class="fc" id="L90">                                double spread = parseDouble(parts[6], &quot;Linia &quot; + lineNo + &quot;: Niepoprawny spread.&quot;);</span>
+<span class="fc" id="L91">                                yield new Currency(symbol, name, basePrice, spread);</span>
+                            }
+                            case COMMODITY -&gt; {
+<span class="pc bpc" id="L94" title="1 of 2 branches missed.">                                if (parts.length != 7) {</span>
+<span class="nc" id="L95">                                    throw new DataIntegrityException(&quot;Linia &quot; + lineNo + &quot;: Niepoprawna linia COMMODITY (oczekiwano 7 pól).&quot;);</span>
+                                }
+<span class="fc" id="L97">                                double storage = parseDouble(parts[6], &quot;Linia &quot; + lineNo + &quot;: Niepoprawny koszt składowania.&quot;);</span>
+<span class="fc" id="L98">                                yield new Commodity(symbol, name, basePrice, storage);</span>
+                            }
+                        };
+
+<span class="fc" id="L102">                        portfolio.putPositionForLoad(currentAsset);</span>
+<span class="fc" id="L103">                    }</span>
+
+                    case LOT -&gt; {
+<span class="pc bpc" id="L106" title="1 of 2 branches missed.">                        if (currentAsset == null) {</span>
+<span class="nc" id="L107">                            throw new DataIntegrityException(&quot;Linia &quot; + lineNo + &quot;: LOT bez ASSET.&quot;);</span>
+                        }
+
+<span class="pc bpc" id="L110" title="1 of 2 branches missed.">                        if (parts.length != 4) {</span>
+<span class="nc" id="L111">                            throw new DataIntegrityException(&quot;Linia &quot; + lineNo + &quot;: Niepoprawna linia LOT (oczekiwano 4 pól).&quot;);</span>
+                        }
+
+<span class="fc" id="L114">                        LocalDate date = parseDate(parts[1], &quot;Linia &quot; + lineNo + &quot;: Niepoprawna data LOT.&quot;);</span>
+<span class="fc" id="L115">                        int qty = parseInt(parts[2], &quot;Linia &quot; + lineNo + &quot;: Niepoprawna ilość LOT.&quot;);</span>
+<span class="fc" id="L116">                        double price = parseDouble(parts[3], &quot;Linia &quot; + lineNo + &quot;: Niepoprawna cena LOT.&quot;);</span>
+
+<span class="fc" id="L118">                        lotsQuantitySum += qty;</span>
+
+<span class="fc" id="L120">                        AssetPosition pos = portfolio.getPositionBySymbol(currentAsset.getSymbol());</span>
+<span class="pc bpc" id="L121" title="1 of 2 branches missed.">                        if (pos == null) {</span>
+<span class="nc" id="L122">                            throw new DataIntegrityException(&quot;Linia &quot; + lineNo + &quot;: Brak pozycji dla symbolu &quot; + currentAsset.getSymbol());</span>
+                        }
+
+<span class="fc" id="L125">                        pos.addLot(new PurchaseLot(date, qty, price));</span>
+                    }
+                }
+<span class="fc" id="L128">            }</span>
+        }
+
+<span class="fc" id="L131">        validateLotsConsistency(declaredQuantity, lotsQuantitySum);</span>
+
+<span class="pc bpc" id="L133" title="1 of 2 branches missed.">        if (portfolio == null) {</span>
+<span class="nc" id="L134">            throw new DataIntegrityException(&quot;Brak HEADER.&quot;);</span>
+        }
+
+<span class="fc" id="L137">        return portfolio;</span>
+    }
+
+    private RecordType parseRecordType(String s, int lineNo) {
+        try {
+<span class="fc" id="L142">            return RecordType.valueOf(s);</span>
+<span class="fc" id="L143">        } catch (IllegalArgumentException e) {</span>
+<span class="fc" id="L144">            throw new DataIntegrityException(&quot;Linia &quot; + lineNo + &quot;: Nieznany rekord: &quot; + s, e);</span>
+        }
+    }
+
+    private AssetType parseAssetType(String s, int lineNo) {
+        try {
+<span class="fc" id="L150">            return AssetType.valueOf(s);</span>
+<span class="nc" id="L151">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L152">            throw new DataIntegrityException(&quot;Linia &quot; + lineNo + &quot;: Nieznany AssetType: &quot; + s, e);</span>
+        }
+    }
+
+    private LocalDate parseDate(String s, String msg) {
+        try {
+<span class="fc" id="L158">            return LocalDate.parse(s);</span>
+<span class="nc" id="L159">        } catch (Exception e) {</span>
+<span class="nc" id="L160">            throw new DataIntegrityException(msg, e);</span>
+        }
+    }
+
+    private void validateLotsConsistency(Integer declared, int sum) {
+<span class="fc bfc" id="L165" title="All 4 branches covered.">        if (declared != null &amp;&amp; declared != sum) {</span>
+<span class="fc" id="L166">            throw new DataIntegrityException(</span>
+                    &quot;Niespójność danych: declaredQuantity=&quot; + declared + &quot;, suma LOT=&quot; + sum
+            );
+        }
+<span class="fc" id="L170">    }</span>
+
+    private double parseDouble(String s, String msg) {
+        try {
+<span class="fc" id="L174">            return Double.parseDouble(s);</span>
+<span class="nc" id="L175">        } catch (NumberFormatException e) {</span>
+<span class="nc" id="L176">            throw new DataIntegrityException(msg, e);</span>
+        }
+    }
+
+    private int parseInt(String s, String msg) {
+        try {
+<span class="fc" id="L182">            return Integer.parseInt(s);</span>
+<span class="nc" id="L183">        } catch (NumberFormatException e) {</span>
+<span class="nc" id="L184">            throw new DataIntegrityException(msg, e);</span>
+        }
+    }
+
+    private String requireNonBlank(String s, String msg) {
+<span class="pc bpc" id="L189" title="2 of 4 branches missed.">        if (s == null || s.isBlank()) {</span>
+<span class="nc" id="L190">            throw new DataIntegrityException(msg);</span>
+        }
+<span class="fc" id="L192">        return s.trim();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

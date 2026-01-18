@@ -7,8 +7,9 @@ public class Commodity extends Asset {
     public Commodity(String symbol, String name, double basePrice, double storageCostPerUnitPerDay) {
         super(symbol, name, basePrice);
 
-        if (storageCostPerUnitPerDay < 0)
+        if (storageCostPerUnitPerDay < 0) {
             throw new IllegalArgumentException("Koszt magazynowania nie może być ujemny.");
+        }
 
         this.storageCostPerUnitPerDay = storageCostPerUnitPerDay;
     }
@@ -16,8 +17,9 @@ public class Commodity extends Asset {
     public double calculateRealValue(int quantity, int daysStored) {
         validateQuantity(quantity);
 
-        if (daysStored < 0)
+        if (daysStored < 0) {
             throw new IllegalArgumentException("Czas przechowywania nie może być ujemny.");
+        }
 
         double gross = getBasePrice() * quantity;
         double storageLoss = storageCostPerUnitPerDay * quantity * daysStored;
@@ -34,5 +36,9 @@ public class Commodity extends Asset {
     public double calculatePurchaseCost(int quantity) {
         validateQuantity(quantity);
         return getBasePrice() * quantity;
+    }
+
+    public double getStorageCostPerUnitPerDay() {
+        return storageCostPerUnitPerDay;
     }
 }

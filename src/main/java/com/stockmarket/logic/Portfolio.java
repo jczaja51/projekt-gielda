@@ -3,8 +3,7 @@ package com.stockmarket.logic;
 import com.stockmarket.domain.Asset;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Portfolio {
 
@@ -12,48 +11,134 @@ public class Portfolio {
 
     private final Map<String, AssetPosition> positions = new HashMap<>();
 
-    public Portfolio(double initialCash) {
+    private final Set<String> watchlist = new HashSet<>();
+
+    private final MarketData marketData;
+
+    private final PriorityQueue<Order> orders;
+
+    public Portfolio(double initialCash, MarketData marketData) {
         if (initialCash < 0) {
-            throw new IllegalArgumentException("Początkowa gotówka nie może być ujemna");
+            throw new IllegalArgumentException("Początkowa gotówka nie może być ujemna.");
         }
+        if (marketData == null) {
+            throw new IllegalArgumentException("MarketData nie może być null.");
+        }
+
         this.cash = initialCash;
+        this.marketData = marketData;
+        this.orders = new PriorityQueue<>(new OrderComparator(marketData));
+    }
+
+    public Portfolio(double initialCash) {
+        this(initialCash, new MarketData());
     }
 
     public double getCash() {
         return cash;
     }
 
-    public int getAssetQuantity(Asset asset) {
-        if (asset == null) throw new IllegalArgumentException("Aktywo null");
-        AssetPosition pos = positions.get(asset.getSymbol());
-        return (pos == null) ? 0 : pos.getTotalQuantity();
-    }
-
     public void buyAsset(Asset asset, int quantity) {
-        if (asset == null) throw new IllegalArgumentException("Aktywo null");
-        if (quantity <= 0) throw new IllegalArgumentException("Ilość musi być dodatnia");
+        if (asset == null) {
+            throw new IllegalArgumentException("Aktywo nie może być null.");
+        }
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("Ilość musi być dodatnia.");
+        }
 
         double cost = asset.calculatePurchaseCost(quantity);
-
         if (cost > cash) {
             throw new IllegalStateException("Brak środków na zakup: potrzebne " + cost);
         }
 
         cash -= cost;
 
-        AssetPosition pos = positions.get(asset.getSymbol());
+        String key = normalizeSymbol(asset.getSymbol());
+        AssetPosition pos = positions.get(key);
         if (pos == null) {
             pos = new AssetPosition(asset);
-            positions.put(asset.getSymbol(), pos);
+            positions.put(key, pos);
         }
 
-        PurchaseLot lot = new PurchaseLot(LocalDate.now(), quantity, asset.getBasePrice());
-        pos.addLot(lot);
+        pos.addLot(new PurchaseLot(LocalDate.now(), quantity, asset.getBasePrice()));
+    }
+
+    public SellResult sellAssetFIFO(String symbol, int quantity, double sellPrice) {
+        String key = normalizeSymbol(symbol);
+
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("Ilość musi być dodatnia.");
+        }
+        if (sellPrice <= 0) {
+            throw new IllegalArgumentException("Cena sprzedaży musi być dodatnia.");
+        }
+
+        AssetPosition position = positions.get(key);
+        if (position == null || position.getTotalQuantity() < quantity) {
+            throw new InsufficientHoldingsException("Brak wystarczającej ilości aktywa: " + key);
+        }
+
+        int remaining = quantity;
+        SellResult result = new SellResult();
+
+        while (remaining > 0) {
+            PurchaseLot lot = position.peekOldestLot();
+
+            if (lot == null) {
+                throw new DataIntegrityException(
+                        "Niespójność FIFO dla " + key + ": brak lotów mimo totalQuantity=" + position.getTotalQuantity()
+                );
+            }
+
+            int available = lot.getQuantity();
+            if (available <= 0) {
+                position.pollOldestLot();
+                continue;
+            }
+
+            int used = Math.min(available, remaining);
+
+            double profit = used * (sellPrice - lot.getUnitPrice());
+            result.addClosure(new LotClosure(lot.getPurchaseDate(), used, profit));
+
+            lot.decreaseQuantity(used);
+            position.decreaseTotalQuantity(used);
+
+            remaining -= used;
+
+            if (lot.getQuantity() == 0) {
+                position.pollOldestLot();
+            }
+        }
+
+        int sold = quantity - remaining;
+        cash += sold * sellPrice;
+
+        return result;
+    }
+
+    public boolean addToWatchlist(String symbol) {
+        String key = normalizeSymbol(symbol);
+        return watchlist.add(key);
+    }
+
+    public void placeOrder(Order order) {
+        if (order == null) {
+            throw new IllegalArgumentException("Order nie może być null.");
+        }
+        orders.add(order);
+    }
+
+    public Order peekNextOrder() {
+        return orders.peek();
+    }
+
+    public int getPendingOrdersCount() {
+        return orders.size();
     }
 
     public double calculateTotalAssetsRealValue() {
         double total = 0.0;
-
         for (AssetPosition pos : positions.values()) {
             int qty = pos.getTotalQuantity();
             if (qty > 0) {
@@ -67,81 +152,29 @@ public class Portfolio {
         return cash + calculateTotalAssetsRealValue();
     }
 
-    public String auditReport() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("=== AUDYT PORTFELA ===\n");
-        sb.append("Gotówka: ").append(cash).append("\n\n");
-
-        for (AssetPosition pos : positions.values()) {
-            Asset asset = pos.getAsset();
-            int qty = pos.getTotalQuantity();
-            double realVal = asset.calculateRealValue(qty);
-
-            sb.append(asset.getName())
-                    .append(" (").append(asset.getSymbol()).append(")")
-                    .append(" | ilość: ").append(qty)
-                    .append(" | wartość rzeczywista: ").append(realVal)
-                    .append("\n");
-
-            for (int i = 0; i < pos.getLots().size(); i++) {
-                PurchaseLot lot = pos.getLots().get(i);
-                sb.append("  LOT | ").append(lot.getPurchaseDate())
-                        .append(" | qty: ").append(lot.getQuantity())
-                        .append(" | price: ").append(lot.getUnitPrice())
-                        .append("\n");
-            }
+    public void putPositionForLoad(Asset asset) {
+        if (asset == null) {
+            throw new IllegalArgumentException("Aktywo nie może być null.");
         }
-
-        sb.append("\nŁączna wartość aktywów: ")
-                .append(calculateTotalAssetsRealValue())
-                .append("\nŁączna wartość portfela: ")
-                .append(calculateTotalValue());
-
-        return sb.toString();
-    }
-}
-
-public SellResult sellAssetFIFO(String symbol, int quantity, double sellPrice) {
-    if (symbol == null || symbol.isBlank())
-        throw new IllegalArgumentException("Symbol nie może być pusty.");
-    if (quantity <= 0)
-        throw new IllegalArgumentException("Ilość musi być dodatnia.");
-    if (sellPrice <= 0)
-        throw new IllegalArgumentException("Cena sprzedaży musi być dodatnia.");
-
-    AssetPosition position = positions.get(symbol.trim().toUpperCase());
-    if (position == null || position.getTotalQuantity() < quantity) {
-        throw new InsufficientHoldingsException(
-                "Brak wystarczającej ilości aktywa: " + symbol
-        );
+        String key = normalizeSymbol(asset.getSymbol());
+        if (!positions.containsKey(key)) {
+            positions.put(key, new AssetPosition(asset));
+        }
     }
 
-    int remainingToSell = quantity;
-    SellResult result = new SellResult();
-
-    for (int i = 0; i < position.getLots().size() && remainingToSell > 0; i++) {
-        PurchaseLot lot = position.getLots().get(i);
-
-        int available = lot.getQuantity();
-        int used = Math.min(available, remainingToSell);
-
-        double profit = used * (sellPrice - lot.getUnitPrice());
-
-        result.addClosure(
-                new LotClosure(
-                        lot.getPurchaseDate(),
-                        used,
-                        profit
-                )
-        );
-
-        lot.decreaseQuantity(used);
-        remainingToSell -= used;
+    public AssetPosition getPositionBySymbol(String symbol) {
+        String key = normalizeSymbol(symbol);
+        return positions.get(key);
     }
 
-    position.getLots().removeIf(lot -> lot.getQuantity() == 0);
+    public Iterable<AssetPosition> getPositions() {
+        return new ArrayList<>(positions.values());
+    }
 
-    cash += quantity * sellPrice;
-
-    return result;
+    private String normalizeSymbol(String symbol) {
+        if (symbol == null || symbol.isBlank()) {
+            throw new IllegalArgumentException("Symbol nie może być pusty.");
+        }
+        return symbol.trim().toUpperCase();
+    }
 }

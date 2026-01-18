@@ -9,6 +9,9 @@ public class SellResult {
     private final List<LotClosure> closures = new ArrayList<>();
 
     public void addClosure(LotClosure closure) {
+        if (closure == null) {
+            throw new IllegalArgumentException("LotClosure nie może być null.");
+        }
         closures.add(closure);
         totalProfit += closure.getProfit();
     }
@@ -18,6 +21,6 @@ public class SellResult {
     }
 
     public List<LotClosure> getClosures() {
-        return closures;
+        return List.copyOf(closures);
     }
 }

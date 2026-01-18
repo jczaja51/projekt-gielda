@@ -3,6 +3,8 @@
 /Users/jakub/Desktop/stock-market-sim/src/main/java/com/stockmarket/domain/Currency.java
 /Users/jakub/Desktop/stock-market-sim/src/main/java/com/stockmarket/domain/Share.java
 /Users/jakub/Desktop/stock-market-sim/src/main/java/com/stockmarket/logic/AssetPosition.java
+/Users/jakub/Desktop/stock-market-sim/src/main/java/com/stockmarket/logic/AssetType.java
+/Users/jakub/Desktop/stock-market-sim/src/main/java/com/stockmarket/logic/DataIntegrityException.java
 /Users/jakub/Desktop/stock-market-sim/src/main/java/com/stockmarket/logic/InsufficientHoldingsException.java
 /Users/jakub/Desktop/stock-market-sim/src/main/java/com/stockmarket/logic/LotClosure.java
 /Users/jakub/Desktop/stock-market-sim/src/main/java/com/stockmarket/logic/MarketData.java
@@ -10,5 +12,9 @@
 /Users/jakub/Desktop/stock-market-sim/src/main/java/com/stockmarket/logic/OrderComparator.java
 /Users/jakub/Desktop/stock-market-sim/src/main/java/com/stockmarket/logic/OrderType.java
 /Users/jakub/Desktop/stock-market-sim/src/main/java/com/stockmarket/logic/Portfolio.java
+/Users/jakub/Desktop/stock-market-sim/src/main/java/com/stockmarket/logic/PortfolioFileReader.java
+/Users/jakub/Desktop/stock-market-sim/src/main/java/com/stockmarket/logic/PortfolioFileWriter.java
+/Users/jakub/Desktop/stock-market-sim/src/main/java/com/stockmarket/logic/PortfolioReportGenerator.java
 /Users/jakub/Desktop/stock-market-sim/src/main/java/com/stockmarket/logic/PurchaseLot.java
+/Users/jakub/Desktop/stock-market-sim/src/main/java/com/stockmarket/logic/RecordType.java
 /Users/jakub/Desktop/stock-market-sim/src/main/java/com/stockmarket/logic/SellResult.java

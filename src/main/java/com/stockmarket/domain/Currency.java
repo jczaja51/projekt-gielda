@@ -7,10 +7,12 @@ public class Currency extends Asset {
     public Currency(String symbol, String name, double basePrice, double spread) {
         super(symbol, name, basePrice);
 
-        if (spread < 0)
+        if (spread < 0) {
             throw new IllegalArgumentException("Spread nie może być ujemny.");
-        if (spread >= basePrice)
+        }
+        if (spread >= basePrice) {
             throw new IllegalArgumentException("Spread nie może być >= cenie bazowej (bid musi być dodatni).");
+        }
 
         this.spread = spread;
     }
@@ -26,7 +28,10 @@ public class Currency extends Asset {
     @Override
     public double calculatePurchaseCost(int quantity) {
         validateQuantity(quantity);
-
         return getBasePrice() * quantity;
+    }
+
+    public double getSpread() {
+        return spread;
     }
 }

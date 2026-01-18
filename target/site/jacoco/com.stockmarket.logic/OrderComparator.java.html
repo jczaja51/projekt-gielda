@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pl"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OrderComparator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Stock Market Simulator</a> &gt; <a href="index.source.html" class="el_package">com.stockmarket.logic</a> &gt; <span class="el_source">OrderComparator.java</span></div><h1>OrderComparator.java</h1><pre class="source lang-java linenums">package com.stockmarket.logic;
+
+import java.util.Comparator;
+
+public class OrderComparator implements Comparator&lt;Order&gt; {
+
+    private final MarketData marketData;
+
+<span class="fc" id="L9">    public OrderComparator(MarketData marketData) {</span>
+<span class="pc bpc" id="L10" title="1 of 2 branches missed.">        if (marketData == null) {</span>
+<span class="nc" id="L11">            throw new IllegalArgumentException(&quot;MarketData nie może być null.&quot;);</span>
+        }
+<span class="fc" id="L13">        this.marketData = marketData;</span>
+<span class="fc" id="L14">    }</span>
+
+    @Override
+    public int compare(Order a, Order b) {
+<span class="fc bfc" id="L18" title="All 2 branches covered.">        if (a == b) return 0;</span>
+<span class="pc bpc" id="L19" title="1 of 2 branches missed.">        if (a == null) return 1;</span>
+<span class="pc bpc" id="L20" title="1 of 2 branches missed.">        if (b == null) return -1;</span>
+
+<span class="fc bfc" id="L22" title="All 2 branches covered.">        if (a.getType() != b.getType()) {</span>
+<span class="fc" id="L23">            return a.getType().compareTo(b.getType());</span>
+        }
+
+<span class="fc" id="L26">        int sym = a.getSymbol().compareTo(b.getSymbol());</span>
+<span class="fc bfc" id="L27" title="All 2 branches covered.">        if (sym != 0) {</span>
+<span class="fc" id="L28">            return sym;</span>
+        }
+
+        int priceCmp;
+<span class="fc bfc" id="L32" title="All 2 branches covered.">        if (a.getType() == OrderType.BUY) {</span>
+<span class="fc" id="L33">            priceCmp = Double.compare(b.getLimitPrice(), a.getLimitPrice());</span>
+        } else {
+<span class="fc" id="L35">            priceCmp = Double.compare(a.getLimitPrice(), b.getLimitPrice());</span>
+        }
+<span class="fc bfc" id="L37" title="All 2 branches covered.">        if (priceCmp != 0) return priceCmp;</span>
+
+<span class="fc" id="L39">        double marketPrice = safeMarketPrice(a.getSymbol());</span>
+<span class="pc bpc" id="L40" title="1 of 2 branches missed.">        if (!Double.isNaN(marketPrice)) {</span>
+<span class="nc" id="L41">            double aScore = attractivenessScore(a, marketPrice);</span>
+<span class="nc" id="L42">            double bScore = attractivenessScore(b, marketPrice);</span>
+
+<span class="nc" id="L44">            int scoreCmp = Double.compare(bScore, aScore);</span>
+<span class="nc bnc" id="L45" title="All 2 branches missed.">            if (scoreCmp != 0) return scoreCmp;</span>
+        }
+
+<span class="fc" id="L48">        return a.getCreatedAt().compareTo(b.getCreatedAt());</span>
+    }
+
+    private double safeMarketPrice(String symbol) {
+        try {
+<span class="nc" id="L53">            return marketData.getPrice(symbol);</span>
+<span class="fc" id="L54">        } catch (RuntimeException ex) {</span>
+<span class="fc" id="L55">            return Double.NaN;</span>
+        }
+    }
+
+    private double attractivenessScore(Order order, double marketPrice) {
+<span class="nc bnc" id="L60" title="All 2 branches missed.">        if (order.getType() == OrderType.BUY) {</span>
+<span class="nc" id="L61">            return order.getLimitPrice() - marketPrice;</span>
+        } else {
+<span class="nc" id="L63">            return marketPrice - order.getLimitPrice();</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>
