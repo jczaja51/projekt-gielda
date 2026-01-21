@@ -64,46 +64,28 @@ public class Portfolio {
     }
 
     public SellResult sellAssetFIFO(String symbol, int quantity, double sellPrice) {
-        String key = normalizeSymbol(symbol);
-
-        if (quantity <= 0) {
-            throw new IllegalArgumentException("Ilość musi być dodatnia.");
-        }
-        if (sellPrice <= 0) {
-            throw new IllegalArgumentException("Cena sprzedaży musi być dodatnia.");
+        if (quantity <= 0 || sellPrice <= 0) {
+            throw new IllegalArgumentException("Niepoprawne dane sprzedaży.");
         }
 
-        AssetPosition position = positions.get(key);
+        AssetPosition position = positions.get(normalizeSymbol(symbol));
         if (position == null || position.getTotalQuantity() < quantity) {
-            throw new InsufficientHoldingsException("Brak wystarczającej ilości aktywa: " + key);
+            throw new InsufficientHoldingsException("Brak wystarczającej ilości aktywa.");
         }
 
-        int remaining = quantity;
         SellResult result = new SellResult();
+        int remaining = quantity;
 
         while (remaining > 0) {
             PurchaseLot lot = position.peekOldestLot();
 
-            if (lot == null) {
-                throw new DataIntegrityException(
-                        "Niespójność FIFO dla " + key + ": brak lotów mimo totalQuantity=" + position.getTotalQuantity()
-                );
-            }
-
-            int available = lot.getQuantity();
-            if (available <= 0) {
-                position.pollOldestLot();
-                continue;
-            }
-
-            int used = Math.min(available, remaining);
+            int used = Math.min(lot.getQuantity(), remaining);
 
             double profit = used * (sellPrice - lot.getUnitPrice());
             result.addClosure(new LotClosure(lot.getPurchaseDate(), used, profit));
 
             lot.decreaseQuantity(used);
             position.decreaseTotalQuantity(used);
-
             remaining -= used;
 
             if (lot.getQuantity() == 0) {
@@ -111,9 +93,7 @@ public class Portfolio {
             }
         }
 
-        int sold = quantity - remaining;
-        cash += sold * sellPrice;
-
+        cash += quantity * sellPrice;
         return result;
     }
 
@@ -127,14 +107,6 @@ public class Portfolio {
             throw new IllegalArgumentException("Order nie może być null.");
         }
         orders.add(order);
-    }
-
-    public Order peekNextOrder() {
-        return orders.peek();
-    }
-
-    public int getPendingOrdersCount() {
-        return orders.size();
     }
 
     public double calculateTotalAssetsRealValue() {

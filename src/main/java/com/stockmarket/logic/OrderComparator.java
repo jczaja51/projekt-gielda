@@ -36,31 +36,6 @@ public class OrderComparator implements Comparator<Order> {
         }
         if (priceCmp != 0) return priceCmp;
 
-        double marketPrice = safeMarketPrice(a.getSymbol());
-        if (!Double.isNaN(marketPrice)) {
-            double aScore = attractivenessScore(a, marketPrice);
-            double bScore = attractivenessScore(b, marketPrice);
-
-            int scoreCmp = Double.compare(bScore, aScore);
-            if (scoreCmp != 0) return scoreCmp;
-        }
-
         return a.getCreatedAt().compareTo(b.getCreatedAt());
-    }
-
-    private double safeMarketPrice(String symbol) {
-        try {
-            return marketData.getPrice(symbol);
-        } catch (RuntimeException ex) {
-            return Double.NaN;
-        }
-    }
-
-    private double attractivenessScore(Order order, double marketPrice) {
-        if (order.getType() == OrderType.BUY) {
-            return order.getLimitPrice() - marketPrice;
-        } else {
-            return marketPrice - order.getLimitPrice();
-        }
     }
 }

@@ -13,11 +13,11 @@ import java.util.List;
 <span class="fc" id="L13">public class PortfolioFileWriter {</span>
 
     public void save(Portfolio portfolio, Path path) throws IOException {
-<span class="fc bfc" id="L16" title="All 2 branches covered.">        if (portfolio == null) {</span>
-<span class="fc" id="L17">            throw new IllegalArgumentException(&quot;Portfolio nie może być null.&quot;);</span>
+<span class="pc bpc" id="L16" title="1 of 2 branches missed.">        if (portfolio == null) {</span>
+<span class="nc" id="L17">            throw new IllegalArgumentException(&quot;Portfolio nie może być null.&quot;);</span>
         }
-<span class="fc bfc" id="L19" title="All 2 branches covered.">        if (path == null) {</span>
-<span class="fc" id="L20">            throw new IllegalArgumentException(&quot;Ścieżka nie może być null.&quot;);</span>
+<span class="pc bpc" id="L19" title="1 of 2 branches missed.">        if (path == null) {</span>
+<span class="nc" id="L20">            throw new IllegalArgumentException(&quot;Ścieżka nie może być null.&quot;);</span>
         }
 
 <span class="fc" id="L23">        try (BufferedWriter writer = Files.newBufferedWriter(path)) {</span>
@@ -62,7 +62,7 @@ import java.util.List;
 <span class="fc" id="L62">    }</span>
 
     private void writeAssetLine(BufferedWriter writer, Asset asset, int declaredQuantity) throws IOException {
-<span class="fc bfc" id="L65" title="All 2 branches covered.">        if (asset instanceof Share) {</span>
+<span class="pc bpc" id="L65" title="1 of 2 branches missed.">        if (asset instanceof Share) {</span>
 <span class="fc" id="L66">            writer.write(&quot;ASSET|SHARE|&quot; +</span>
 <span class="fc" id="L67">                    asset.getSymbol() + &quot;|&quot; +</span>
 <span class="fc" id="L68">                    asset.getName() + &quot;|&quot; +</span>
@@ -71,29 +71,29 @@ import java.util.List;
 <span class="fc" id="L71">            return;</span>
         }
 
-<span class="fc bfc" id="L74" title="All 2 branches covered.">        if (asset instanceof Currency) {</span>
-<span class="fc" id="L75">            Currency c = (Currency) asset;</span>
-<span class="fc" id="L76">            writer.write(&quot;ASSET|CURRENCY|&quot; +</span>
-<span class="fc" id="L77">                    c.getSymbol() + &quot;|&quot; +</span>
-<span class="fc" id="L78">                    c.getName() + &quot;|&quot; +</span>
-<span class="fc" id="L79">                    c.getBasePrice() + &quot;|&quot; +</span>
+<span class="nc bnc" id="L74" title="All 2 branches missed.">        if (asset instanceof Currency) {</span>
+<span class="nc" id="L75">            Currency c = (Currency) asset;</span>
+<span class="nc" id="L76">            writer.write(&quot;ASSET|CURRENCY|&quot; +</span>
+<span class="nc" id="L77">                    c.getSymbol() + &quot;|&quot; +</span>
+<span class="nc" id="L78">                    c.getName() + &quot;|&quot; +</span>
+<span class="nc" id="L79">                    c.getBasePrice() + &quot;|&quot; +</span>
                     declaredQuantity + &quot;|&quot; +
-<span class="fc" id="L81">                    c.getSpread());</span>
-<span class="fc" id="L82">            return;</span>
+<span class="nc" id="L81">                    c.getSpread());</span>
+<span class="nc" id="L82">            return;</span>
         }
 
-<span class="fc bfc" id="L85" title="All 2 branches covered.">        if (asset instanceof Commodity) {</span>
-<span class="fc" id="L86">            Commodity c = (Commodity) asset;</span>
-<span class="fc" id="L87">            writer.write(&quot;ASSET|COMMODITY|&quot; +</span>
-<span class="fc" id="L88">                    c.getSymbol() + &quot;|&quot; +</span>
-<span class="fc" id="L89">                    c.getName() + &quot;|&quot; +</span>
-<span class="fc" id="L90">                    c.getBasePrice() + &quot;|&quot; +</span>
+<span class="nc bnc" id="L85" title="All 2 branches missed.">        if (asset instanceof Commodity) {</span>
+<span class="nc" id="L86">            Commodity c = (Commodity) asset;</span>
+<span class="nc" id="L87">            writer.write(&quot;ASSET|COMMODITY|&quot; +</span>
+<span class="nc" id="L88">                    c.getSymbol() + &quot;|&quot; +</span>
+<span class="nc" id="L89">                    c.getName() + &quot;|&quot; +</span>
+<span class="nc" id="L90">                    c.getBasePrice() + &quot;|&quot; +</span>
                     declaredQuantity + &quot;|&quot; +
-<span class="fc" id="L92">                    c.getStorageCostPerUnitPerDay());</span>
-<span class="fc" id="L93">            return;</span>
+<span class="nc" id="L92">                    c.getStorageCostPerUnitPerDay());</span>
+<span class="nc" id="L93">            return;</span>
         }
 
-<span class="fc" id="L96">        throw new IllegalStateException(&quot;Nieznany typ aktywa: &quot; + asset.getClass().getName());</span>
+<span class="nc" id="L96">        throw new IllegalStateException(&quot;Nieznany typ aktywa: &quot; + asset.getClass().getName());</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

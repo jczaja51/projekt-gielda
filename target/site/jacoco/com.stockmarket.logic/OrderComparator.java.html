@@ -36,32 +36,7 @@ public class OrderComparator implements Comparator&lt;Order&gt; {
         }
 <span class="fc bfc" id="L37" title="All 2 branches covered.">        if (priceCmp != 0) return priceCmp;</span>
 
-<span class="fc" id="L39">        double marketPrice = safeMarketPrice(a.getSymbol());</span>
-<span class="pc bpc" id="L40" title="1 of 2 branches missed.">        if (!Double.isNaN(marketPrice)) {</span>
-<span class="nc" id="L41">            double aScore = attractivenessScore(a, marketPrice);</span>
-<span class="nc" id="L42">            double bScore = attractivenessScore(b, marketPrice);</span>
-
-<span class="nc" id="L44">            int scoreCmp = Double.compare(bScore, aScore);</span>
-<span class="nc bnc" id="L45" title="All 2 branches missed.">            if (scoreCmp != 0) return scoreCmp;</span>
-        }
-
-<span class="fc" id="L48">        return a.getCreatedAt().compareTo(b.getCreatedAt());</span>
-    }
-
-    private double safeMarketPrice(String symbol) {
-        try {
-<span class="nc" id="L53">            return marketData.getPrice(symbol);</span>
-<span class="fc" id="L54">        } catch (RuntimeException ex) {</span>
-<span class="fc" id="L55">            return Double.NaN;</span>
-        }
-    }
-
-    private double attractivenessScore(Order order, double marketPrice) {
-<span class="nc bnc" id="L60" title="All 2 branches missed.">        if (order.getType() == OrderType.BUY) {</span>
-<span class="nc" id="L61">            return order.getLimitPrice() - marketPrice;</span>
-        } else {
-<span class="nc" id="L63">            return marketPrice - order.getLimitPrice();</span>
-        }
+<span class="fc" id="L39">        return a.getCreatedAt().compareTo(b.getCreatedAt());</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

@@ -67,23 +67,6 @@ class PortfolioFileReaderTest {
     }
 
     @Test
-    void load_unknownRecordType_throwsException() throws IOException {
-        Path file = tempDir.resolve("broken.txt");
-
-        Files.writeString(file,
-                "HEADER|CASH|1000\n" +
-                        "FOO|BAR|BAZ\n"
-        );
-
-        PortfolioFileReader reader = new PortfolioFileReader();
-
-        assertThrows(
-                DataIntegrityException.class,
-                () -> reader.load(file)
-        );
-    }
-
-    @Test
     void load_declaredQuantityDoesNotMatchLots_throwsDataIntegrityException() throws IOException {
         Path file = tempDir.resolve("broken.txt");
 

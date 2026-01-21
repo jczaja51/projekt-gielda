@@ -1,13 +1,12 @@
 com/stockmarket/OrderPriorityTest.class
+com/stockmarket/PortfolioPersistenceConsistencyTest.class
+com/stockmarket/OrderMatchingConsistencyTest.class
 com/stockmarket/PortfolioFileWriterTest.class
 com/stockmarket/FifoSellEdgeCaseTest.class
 com/stockmarket/PortfolioReportGeneratorTest.class
-com/stockmarket/PortfolioFileWriterTest$1.class
-com/stockmarket/OrderPriorityEdgeCaseTest.class
-com/stockmarket/PortfolioExceptionTest.class
-com/stockmarket/PortfolioPersistenceConsistencyTest.class
-com/stockmarket/OrderMatchingConsistencyTest.class
 com/stockmarket/PolymorphismTest.class
 com/stockmarket/MarketDataTest.class
 com/stockmarket/PortfolioFileReaderTest.class
+com/stockmarket/OrderPriorityEdgeCaseTest.class
+com/stockmarket/PortfolioExceptionTest.class
 com/stockmarket/FifoSellTest.class
